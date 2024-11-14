@@ -1,24 +1,35 @@
 const express = require("express");
 
 const app = express();
+const { adminAuth } = require("./middlewares/auth");
 
-// app.get("/user", (req, res) => {
-//   res.send("This will only handle get calls");
+// app.use("/", (req, res, next) => {
+//   console.log("Handling / route");
+//   next();
 // });
 
-// app.post("/user", (req, res) => {
-//   res.send("This will handle only post calls");
-//   console.log("save data");
+// app.get("/user", (req, res, next) => {
+//   console.log("Handling the route user");
+//   next();
 // });
 
-//handle dynamic routes based on id
-app.get("/user/:userId", (req, res) => {
-  console.log(req.query);
-  res.send({ firstName: "Samarth", lastName: "M" });
+// app.get("/user", (req, res, next) => {
+//   console.log("Handling the route user");
+//   res.send("Second route handler");
+// });
+
+// Importance of route handlers and middleware
+app.use("/admin", adminAuth);
+
+app.get("/admin/getAllData", (req, res, next) => {
+  //logic of checking if the user is authorized
+  //Logic of fetching all data
+  res.send("All data sent");
 });
 
-app.use("/", (req, res) => {
-  res.send("Hello from the dashboard!");
+app.delete("/admin/deleteUser", (req, res, next) => {
+  // checking if the user is authorized ==> instead of writing the logic everytime , we use middleware
+  res.send("delete a user");
 });
 
 app.listen(7777, () =>
