@@ -2,19 +2,25 @@ const express = require("express");
 const app = express();
 const connectDb = require("./config/database");
 const User = require("./models/user");
+const { validateSignUpData } = require("./utils/validation");
 
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  console.log(req.body);
-  //creating a new instance of the user model
-  const user = new User(req.body);
-
   try {
+    //Validation of the data
+    validateSignUpData(req);
+
+    // Encrypt the password
+    
+
+    //creating a new instance of the user model
+    const user = new User(req.body);
+
     await user.save();
     res.send("User added successfully!");
   } catch (err) {
-    res.status(400).send("Error saving the user:" + err.message);
+    res.status(400).send("ERROR : " + err.message);
   }
 });
 
