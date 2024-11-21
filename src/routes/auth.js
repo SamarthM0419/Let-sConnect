@@ -15,7 +15,6 @@ authRouter.post("/signup", async (req, res) => {
 
     // Encrypt the password
     const passwordHash = await bcrypt.hash(password, 10);
-    console.log(passwordHash);
 
     //creating a new instance of the user model
     const user = new User({
@@ -49,11 +48,22 @@ authRouter.post("/login", async (req, res) => {
     if (isPasswordValid) {
       const token = await user.getJWT();
 
-      res.cookie("token", token);
+      res.cookie("token", token, { maxAge: 24 * 60 * 60 * 1000 });
       res.send("Login Successful!!");
     } else {
       throw new Error("Invalid credentials");
     }
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
+});
+
+authRouter.post("/logout", async (req, res) => {
+  try {
+    res.cookie("token", null, {
+      expires: new Date(Date.now()),
+    });
+    res.send("Logout Successful!!");
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
