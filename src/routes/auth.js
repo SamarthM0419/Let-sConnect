@@ -3,6 +3,7 @@ const { validateSignUpData } = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const validator = require("validator");
+const jwt = require("jsonwebtoken");
 
 const authRouter = express.Router();
 
@@ -48,7 +49,10 @@ authRouter.post("/login", async (req, res) => {
     if (isPasswordValid) {
       const token = await user.getJWT();
 
-      res.cookie("token", token, { maxAge: 24 * 60 * 60 * 1000 });
+      res.cookie("token", token, {
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
       res.send("Login Successful!!");
     } else {
       throw new Error("Invalid credentials");
