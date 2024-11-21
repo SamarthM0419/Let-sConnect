@@ -6,7 +6,6 @@ const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
 const { userAuth } = require("./middlewares/auth");
 
 app.use(express.json());
@@ -53,10 +52,8 @@ app.post("/login", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (isPasswordValid) {
-      // create a JWT token
-      const token = await jwt.sign({ _id: user._id }, "NeyMar@1011");
+      const token = await user.getJWT();
 
-      // Add the token to cookie and send the response back to user
       res.cookie("token", token);
       res.send("Login Successful!!");
     } else {
@@ -78,6 +75,14 @@ app.get("/profile", userAuth, async (req, res) => {
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
+});
+
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  const data = req.user;
+
+  //sending a connection request
+  console.log("sending a connection request");
+  res.send(data.firstName + " sent connection request");
 });
 
 connectDb()
