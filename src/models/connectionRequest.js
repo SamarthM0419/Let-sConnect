@@ -24,6 +24,20 @@ const connectionRequestSchema = new mongoose.Schema(
   }
 );
 
+// compound index => when queried using both the fields , it will automatically become very fast.
+connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
+
+// called everytime connectionRequest is saved
+connectionRequestSchema.pre("save", function (next) {
+  const connectionRequest = this;
+
+  // check if from and to userId are same
+  if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
+    throw new Error("Cannot send connection request to yourself");
+  }
+  next();
+});
+
 const ConnectionRequestModel = new mongoose.model(
   "ConnectionRequest",
   connectionRequestSchema
