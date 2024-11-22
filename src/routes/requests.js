@@ -53,7 +53,8 @@ requestRouter.post(
       const data = await connectionRequest.save();
 
       res.json({
-        message: req.user.firstName + " is " + status + " in " + toUser.firstName,
+        message:
+          req.user.firstName + " is " + status + " in " + toUser.firstName,
         data,
       });
     } catch (err) {
@@ -62,6 +63,45 @@ requestRouter.post(
   }
 );
 
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+      const { status, requestId } = req.params;
 
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res.status(400).json({ message: "Status not allowed!!" });
+      }
+
+      const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUser._id,
+        status: "interested",
+      });
+
+      if (!connectionRequest) {
+        return res
+          .status(404)
+          .json({ message: "Connection Request not found!!!" });
+      }
+
+      connectionRequest.status = status;
+      const data = await connectionRequest.save();
+
+      res.json({ message: "Connection Request " + status, data });
+    } catch (err) {
+      res.status(400).send("ERROR:" + err.message);
+
+      // Reciever is same as the logged in user => toUserId === loggedInuser
+      // If connection request is ignored nobody can change the status , it can be either accepted/rejected only if it is interested
+      // status must be only interested
+      // validation on status === accepted or rejected
+      // check requestId should be valid
+    }
+  }
+);
 
 module.exports = requestRouter;
