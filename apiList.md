@@ -25,4 +25,10 @@
 - GET user/requests
 - GET user/feed - Gets you profile of other users of profile
 
+ - user should see all the cards
+ - Avoid his own card
+ - His connections 
+ - Ignored cards should not be seen
+ - Already sent connection request
+
 Status : ignored , interested , accepted , rejected

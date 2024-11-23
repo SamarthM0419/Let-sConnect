@@ -54,4 +54,22 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
   }
 });
 
+userRouter.get("/user/feed", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+
+    // find all connection requests ( sent + recieved )
+    const connectionRequest = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    })
+      .select(" fromUserId toUserId ")
+      .populate("fromUserId", "firstName")
+      .populate("toUserId", "firstName");
+
+    res.send(connectionRequest);
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
+});
+
 module.exports = userRouter;
