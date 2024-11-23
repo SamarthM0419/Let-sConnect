@@ -1,6 +1,7 @@
 const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 
 const userRouter = express.Router();
 
@@ -61,12 +62,22 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
     // find all connection requests ( sent + recieved )
     const connectionRequest = await ConnectionRequest.find({
       $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
-    })
-      .select(" fromUserId toUserId ")
-      .populate("fromUserId", "firstName")
-      .populate("toUserId", "firstName");
+    }).select(" fromUserId toUserId ");
 
-    res.send(connectionRequest);
+    const hideUsersFromFeed = new Set();
+    connectionRequest.forEach((request) => {
+      hideUsersFromFeed.add(request.fromUserId.toString());
+      hideUsersFromFeed.add(request.toUserId.toString());
+    });
+
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } }, // not to be seen the set
+        { _id: { $ne: loggedInUser._id } }, // not equal to
+      ],
+    }).select(USER_SAFE_DATA);
+
+    res.send(users);
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
