@@ -53,7 +53,9 @@ authRouter.post("/login", async (req, res) => {
         maxAge: 24 * 60 * 60 * 1000,
       });
 
-      res.send("Login Successful!!");
+      res.json({
+        data: user,
+      });
     } else {
       throw new Error("Invalid credentials");
     }
