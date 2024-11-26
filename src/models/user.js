@@ -55,8 +55,7 @@ const userSchema = new mongoose.Schema(
     },
     photoUrl: {
       type: String,
-      default:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsNXj8evOgPR7FrKaf9gID3DFAIJbavDkZyQ&s",
+      default: "https://geographyandyou.com/images/user-profile.png",
       validate(value) {
         if (!validator.isURL(value)) {
           throw new Error("Invalid URL");
