@@ -19,7 +19,7 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 
 profileRouter.patch(
   "/profile/edit",
-  cors({ origin: "http://localhost:3000", credentials: true }),
+  cors({ origin: "http://localhost:3000", userAuth, credentials: true }),
   userAuth,
   async (req, res) => {
     try {
