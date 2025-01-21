@@ -55,9 +55,9 @@ authRouter.post("/login", async (req, res) => {
     if (isPasswordValid) {
       const token = await user.getJWT();
 
-      res.cookie("token", token, {
-        maxAge: 24 * 60 * 60 * 1000,
-      });
+        res.cookie("token", token, {
+          maxAge: 24 * 60 * 60 * 1000,
+        });
 
       res.json({
         data: user,
