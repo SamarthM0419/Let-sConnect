@@ -32,8 +32,8 @@ const createSendEmailCommand = (toAddress, fromAddress, subject, body) => {
 
 const run = async (subject, body, toEmailId) => {
   const sendEmailCommand = createSendEmailCommand(
-    "",
-    "",
+    "samarth2534@gmail.com",
+    toEmailId,
     subject,
     body
   );
@@ -48,6 +48,5 @@ const run = async (subject, body, toEmailId) => {
     throw caught;
   }
 };
-
 
 module.exports = { run };
