@@ -7,3 +7,14 @@
 - send emails
 
 - Advance technique : Queing , batching , npm bee-queue 
+
+
+# WebSockets
+- Build the UI for chat window - /chat/:targetUserId
+- setup socket.io in backend
+- npm i socket.io
+
+
+ # Payment Gateway Integration - RazorPay
+ 
+
