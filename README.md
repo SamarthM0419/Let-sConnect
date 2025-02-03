@@ -19,6 +19,17 @@
 - Whenever there is a socket connection, we need to create a room. I has a room _id and can have   multiple participants in the room.
 
 
+- Steps involed during web socket connection:
+ 
+  # BackEnd and FrontEnd
+  - initialize the socket
+  - Establish connection - BE
+  - join the room - FE
+  - create secretRoom and let users join the room - BE
+  - send the message - FE , BE
+  - Disconnect the connection
+
+
  # Payment Gateway Integration - RazorPay
  
 
