@@ -10,11 +10,22 @@ const initializeSocket = (server) => {
   io.on("connection", (socket) => {
     // handle events
 
-    socket.on("joinChat", () => {});
+    socket.on("joinChat", ({ firstName, userId, targetUserId }) => {
+      const a = String(userId);
+      const b = String(targetUserId);
+      const roomId = [a, b].sort();
 
-    socket.on("sendMesaage", () => {});
+      console.log(`${firstName} joined room: ${roomId}`);
+      socket.join(roomId);
+    });
 
-    socket.on("disConnect", () => {});
+    socket.on("sendMessage", ({ firstName, userId, targetUserId, text }) => {
+      const roomId = [userId, targetUserId].join("_");
+      console.log(firstName + " : " + text);
+      io.to(roomId).emit("messageReceived", { firstName, text });
+    });
+
+    socket.on("disconnect", () => {});
   });
 };
 
