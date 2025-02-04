@@ -30,6 +30,10 @@
   - Disconnect the connection
 
 
+  # save messages to database
+  - can be the first message
+  - append to the existing messages
+
  # Payment Gateway Integration - RazorPay
  
 
