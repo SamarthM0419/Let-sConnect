@@ -33,7 +33,6 @@ const initializeSocket = (server) => {
       const trimmedTargetUserId = targetUserId.trim();
       const roomId = getSecretRoomId(userId, trimmedTargetUserId);
 
-      
       try {
         const connectionExists = await ConnectionRequest.findOne({
           $or: [
@@ -71,10 +70,40 @@ const initializeSocket = (server) => {
         chat.messages.push({
           senderId: userId,
           text,
+          timestamp: new Date(),
         });
 
         await chat.save();
         io.to(roomId).emit("messageReceived", { firstName, lastName, text });
+      } catch (err) {
+        console.log(err);
+      }
+    });
+
+    socket.on("seenMessage", async (data) => {
+      const { userId, targetUserId } = data;
+      const trimmedTargetUserId = targetUserId.trim();
+      const roomId = getSecretRoomId(userId, trimmedTargetUserId);
+
+      try {
+        const chat = await Chat.findOne({
+          participants: { $all: [userId, targetUserId] },
+        });
+
+        if (!chat) return;
+
+        let updated = false;
+        chat.messages.forEach((msg) => {
+          if (msg.senderId.toString() === targetUserId && !msg.seen) {
+            msg.seen = true;
+            updated = true;
+          }
+        });
+
+        if (updated) {
+          await chat.save();
+          io.to(roomId).emit("messageSeen", { senderId: targetUserId });
+        }
       } catch (err) {
         console.log(err);
       }
