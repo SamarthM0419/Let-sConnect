@@ -31,4 +31,39 @@ const validateEditProfile = (req) => {
   return isEditAllowed;
 };
 
-module.exports = { validateSignUpData, validateEditProfile };
+const validateChatMessage = async (req, res, next) => {
+  let { message, recieverId } = req.body;
+  const targetUserId = recieverId?.trim();
+  const senderId = req.user._id;
+
+  try {
+    if (!message || typeof message != "string") {
+      return res.status(400).json({ error: "Message can't be emplty" });
+    }
+
+    message = message.trim();
+
+    if (message.length < 1 || message.length > 500) {
+      return res
+        .status(400)
+        .json({ error: "Message must be between 1 and 500 characters" });
+    }
+
+    if (senderId.toString() === receiverId) {
+      return res
+        .status(400)
+        .json({ error: "You cannot send a message to yourself" });
+    }
+
+    req.body.message = message;
+    next();
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports = {
+  validateSignUpData,
+  validateEditProfile,
+  validateChatMessage,
+};

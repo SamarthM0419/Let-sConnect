@@ -1,6 +1,7 @@
 const socket = require("socket.io");
 const crypto = require("crypto");
 const { Chat } = require("../models/chat");
+const ConnectionRequest = require("../models/connectionRequest");
 
 const getSecretRoomId = (userId, targetUserId) => {
   return crypto
@@ -28,12 +29,35 @@ const initializeSocket = (server) => {
     });
 
     socket.on("sendMessage", async (data) => {
-      const { firstName, userId, targetUserId, text } = data;
+      const { firstName, lastName, userId, targetUserId, text } = data;
       const trimmedTargetUserId = targetUserId.trim();
       const roomId = getSecretRoomId(userId, trimmedTargetUserId);
-      // save messages to the database
+
+      
       try {
-        const chat = await Chat.findOne({
+        const connectionExists = await ConnectionRequest.findOne({
+          $or: [
+            {
+              fromUserId: userId,
+              toUserId: trimmedTargetUserId,
+              status: "accepted",
+            },
+            {
+              fromUserId: trimmedTargetUserId,
+              toUserId: userId,
+              status: "accepted",
+            },
+          ],
+        });
+
+        if (!connectionExists) {
+          console.log("Message blocked: Users are not connected.");
+          return;
+        }
+
+        // save messages to the database
+
+        let chat = await Chat.findOne({
           participants: { $all: [userId, trimmedTargetUserId] },
         });
 
@@ -49,9 +73,8 @@ const initializeSocket = (server) => {
           text,
         });
 
-        console.log(chat);
         await chat.save();
-        io.to(roomId).emit("messageReceived", { firstName, text });
+        io.to(roomId).emit("messageReceived", { firstName, lastName, text });
       } catch (err) {
         console.log(err);
       }
